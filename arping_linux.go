@@ -1,6 +1,7 @@
 package arping
 
 import (
+	"fmt"
 	"net"
 	"syscall"
 	"time"
@@ -28,6 +29,8 @@ func receive() (arpDatagram, time.Time, error) {
 	n, _, err := syscall.Recvfrom(sock, buffer, 0)
 	if err != nil {
 		return arpDatagram{}, time.Now(), err
+	} else if n == 0 {
+		return arpDatagram{}, time.Now(), fmt.Errorf("Received empty ARP packet")
 	}
 	// skip 14 bytes ethernet header
 	return parseArpDatagram(buffer[14:n]), time.Now(), nil
